@@ -1,5 +1,7 @@
 from htmlnode import LeafNode
 
+import re
+
 text_type_text = "text"
 text_type_bold = "bold"
 text_type_italic = "italic"
@@ -51,3 +53,20 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 new_type = text_type if i % 2 else text_type_text
                 new_nodes.append(TextNode(text, new_type))
     return new_nodes
+
+
+def extract_markdown_images(text):
+    """ return a list of tuples with the image text and url"""
+    # the regex pattern to match markdown images r"!\[(.*?)\]\((.*?)\)" 
+
+    pattern = r"!\[(.*?)\]\((.*?)\)"
+    return re.findall(pattern, text)
+
+
+def extract_markdown_links(text):
+    """ return a list of tuples with the link text and url"""
+    # the regex pattern to match markdown links r"\[(.*?)\]\((.*?)\)" 
+
+    pattern = r"\[(.*?)\]\((.*?)\)"
+    return re.findall(pattern, text)
+
