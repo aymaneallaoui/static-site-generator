@@ -10,7 +10,7 @@ from textnode import (
     text_type_link,
 )
 
-from textnode import split_nodes_delimiter , extract_markdown_links, extract_markdown_images
+from textnode import split_nodes_delimiter , extract_markdown_links, extract_markdown_images , split_nodes_image , split_nodes_link
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -93,9 +93,63 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         expected_links = [("link", "https://www.boot.dev"), ("link2", "https://www.boot.dev/2")]
         self.assertEqual(links, expected_links)
 
+
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_split_nodes_image(self):
+        node = TextNode("This is text with an image ![image](https://www.boot.dev)", text_type_text)
+        new_nodes = split_nodes_image([node])
+        expected_nodes = [
+            TextNode("This is text with an image ", text_type_text),
+            TextNode("image", text_type_image, "https://www.boot.dev"),
+        ]
+        self.assertEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_image_no_image(self):
+        node = TextNode("This is text with an image", text_type_text)
+        new_nodes = split_nodes_image([node])
+        expected_nodes = [node]
+        self.assertEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_image_multiple_images(self):
+        node = TextNode("This is text with an image ![image](https://www.boot.dev) and another ![image2](https://www.boot.dev/2)", text_type_text)
+        new_nodes = split_nodes_image([node])
+        expected_nodes = [
+            TextNode("This is text with an image ", text_type_text),
+            TextNode("image", text_type_image, "https://www.boot.dev"),
+            TextNode(" and another ", text_type_text),
+            TextNode("image2", text_type_image, "https://www.boot.dev/2"),
+        ]
+        self.assertEqual(new_nodes, expected_nodes)
+
+
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_split_nodes_link(self):
+        node = TextNode("This is text with a link [link](https://www.boot.dev)", text_type_text)
+        new_nodes = split_nodes_link([node])
+        expected_nodes = [
+            TextNode("This is text with a link ", text_type_text),
+            TextNode("link", text_type_link, "https://www.boot.dev"),
+        ]
+        self.assertEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_link_no_link(self):
+        node = TextNode("This is text with a link", text_type_text)
+        new_nodes = split_nodes_link([node])
+        expected_nodes = [node]
+        self.assertEqual(new_nodes, expected_nodes)
+
+    def test_split_nodes_link_multiple_links(self):
+        node = TextNode("This is text with a link [link](https://www.boot.dev) and another [link2](https://www.boot.dev/2)", text_type_text)
+        new_nodes = split_nodes_link([node])
+        expected_nodes = [
+            TextNode("This is text with a link ", text_type_text),
+            TextNode("link", text_type_link, "https://www.boot.dev"),
+            TextNode(" and another ", text_type_text),
+            TextNode("link2", text_type_link, "https://www.boot.dev/2"),
+        ]
+        self.assertEqual(new_nodes, expected_nodes)
 if __name__ == "__main__":
     unittest.main()
 
-
-if __name__ == "__main__":
-    unittest.main()

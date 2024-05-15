@@ -10,7 +10,6 @@ text_type_link = "link"
 text_type_image = "image"
 
 
-
 class TextNode:
     def __init__(self, text, text_type, url=None):
         self.text = text
@@ -57,7 +56,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 def extract_markdown_images(text):
     """ return a list of tuples with the image text and url"""
-    # the regex pattern to match markdown images r"!\[(.*?)\]\((.*?)\)" 
+    # the regex pattern to match markdown images r"!\[(.*?)\]\((.*?)\)"
 
     pattern = r"!\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
@@ -65,8 +64,67 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     """ return a list of tuples with the link text and url"""
-    # the regex pattern to match markdown links r"\[(.*?)\]\((.*?)\)" 
+    # the regex pattern to match markdown links r"\[(.*?)\]\((.*?)\)"
 
     pattern = r"\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != text_type_text:
+            new_nodes.append(node)
+        else:
+            original_text = node.text
+            images = extract_markdown_images(original_text)
+            if len(images) == 0:
+                new_nodes.append(node)
+            else:
+                start = 0
+                for image in images:
+                    image_markdown = f"![{image[0]}]({image[1]})"
+                    image_start = original_text.find(image_markdown)
+                    image_end = image_start + len(image_markdown)
+
+                    text_before = original_text[start:image_start]
+                    if text_before:
+                        new_nodes.append(TextNode(text_before, text_type_text))
+                    new_nodes.append(
+                        TextNode(image[0], text_type_image, image[1]))
+                    start = image_end
+                text_after = original_text[start:]
+                if text_after:
+                    new_nodes.append(TextNode(text_after, text_type_text))
+    return new_nodes
+
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != text_type_text:
+            new_nodes.append(node)
+        else:
+            original_text = node.text
+            links = extract_markdown_links(original_text)
+            if len(links) == 0:
+                new_nodes.append(node)
+            else:
+                start = 0
+                for link in links:
+                    link_markdown = f"[{link[0]}]({link[1]})"
+                    link_start = original_text.find(link_markdown)
+                    link_end = link_start + len(link_markdown)
+
+                    text_before = original_text[start:link_start]
+                    if text_before:
+                        new_nodes.append(TextNode(text_before, text_type_text))
+                    new_nodes.append(
+                        TextNode(link[0], text_type_link, link[1]))
+                    start = link_end
+                text_after = original_text[start:]
+                if text_after:
+                    new_nodes.append(TextNode(text_after, text_type_text))
+    return new_nodes
