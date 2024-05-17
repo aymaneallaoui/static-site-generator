@@ -40,16 +40,14 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def extract_markdown_images(text):
-    """ return a list of tuples with the image text and url"""
-    # the regex pattern to match markdown images r"!\[(.*?)\]\((.*?)\)"
+    """ return a list of tuples with the image text and url idk why i'm writing comment on useless func tiz omak khara """
 
     pattern = r"!\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
 
 def extract_markdown_links(text):
-    """ return a list of tuples with the link text and url"""
-    # the regex pattern to match markdown links r"\[(.*?)\]\((.*?)\)"
+    """ return a list of tuples with the link text and url idk why i'm writing comment on useless func tiz omak khara """
 
     pattern = r"\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
@@ -154,7 +152,7 @@ def markdown_to_blocks(markdown):
                 current_block = []
         else:
             current_block.append(line)
-            # Adding this condition to handle multiple heading blocks
+
             if detect_block_type(current_block) == block_type_heading:
                 blocks.append(current_block)
                 current_block = []
@@ -189,11 +187,11 @@ def block_to_html_node(block, block_type):
         return ParentNode(f"h{heading_level}", [text_node_to_html_node(node) for node in text_to_textnodes(content)])
 
     elif block_type == block_type_code:
-        # Collect code block lines, excluding the first and last lines (```)
+
         code_lines = block[1:-1]
-        # Ensure final newline is preserved
+
         code_text = "\n".join(code_lines) + "\n"
-        # Correctly initialize LeafNode
+
         return ParentNode("pre", [LeafNode("code", code_text)])
     elif block_type == block_type_quote:
         quote_content = " ".join([line.lstrip("> ").strip() for line in block])

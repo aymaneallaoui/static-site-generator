@@ -9,7 +9,7 @@ def run(
     port=3000,
     directory=None,
 ):
-    if directory:  # Change the current working directory if directory is specified
+    if directory:
         os.chdir(directory)
     server_address = ("", port)
     httpd = server_class(server_address, handler_class)
