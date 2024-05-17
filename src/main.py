@@ -1,6 +1,6 @@
 import os
 import shutil
-
+from pathlib import Path
 from textnode import markdown_to_html_node
 
 
@@ -53,10 +53,23 @@ def generate_page(from_path, template_path, dest_path):
     print(f"Written to {dest_path}")
 
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in os.listdir(dir_path_content):
+        source_path = os.path.join(dir_path_content, entry)
+        if os.path.isfile(source_path) and source_path.endswith('.md'):
+            dest_path = os.path.join(
+                dest_dir_path, Path(source_path).stem + '.html')
+            generate_page(source_path, template_path, dest_path)
+        elif os.path.isdir(source_path):
+            new_dest_dir_path = os.path.join(dest_dir_path, entry)
+            os.makedirs(new_dest_dir_path, exist_ok=True)
+            generate_pages_recursive(
+                source_path, template_path, new_dest_dir_path)
+
+
 def main():
     copy_directory("static", "public")
-    generate_page("content/index.md", "templates/base.html",
-                  "public/index.html")
+    generate_pages_recursive("content", "templates/base.html", "public")
 
 
 if __name__ == "__main__":
