@@ -38,21 +38,25 @@ def generate_page(from_path, template_path, dest_path):
 
     html_node = markdown_to_html_node(markdown)
     html = html_node.to_html()
+
     title = extract_title(markdown)
+    print(f"Title: {title}")
 
     new_html = template.replace(
         "{{ Title }}", title).replace("{{ Content }}", html)
+    # print(f"New HTML: {new_html}")
 
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
     with open(dest_path, 'w') as file:
         file.write(new_html)
+    print(f"Written to {dest_path}")
 
 
 def main():
+    copy_directory("static", "public")
     generate_page("content/index.md", "templates/base.html",
                   "public/index.html")
-    copy_directory("static", "public")
 
 
 if __name__ == "__main__":
