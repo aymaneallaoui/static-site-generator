@@ -24,6 +24,11 @@ class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
         super().__init__(tag, value, None, props)
 
+    def __eq__(self, other):
+        if not isinstance(other, LeafNode):
+            return False
+        return self.tag == other.tag and self.value == other.value and self.props == other.props
+
     def to_html(self):
         if self.value is None:
             raise ValueError("Invalid HTML: no value")
@@ -38,6 +43,11 @@ class LeafNode(HTMLNode):
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
         super().__init__(tag, None, children, props)
+
+    def __eq__(self, other):
+        if not isinstance(other, ParentNode):
+            return False
+        return (self.tag == other.tag and self.children == other.children and self.props == other.props)
 
     def to_html(self):
         if self.tag is None:
