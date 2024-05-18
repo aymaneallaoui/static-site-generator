@@ -27,7 +27,7 @@ class LeafNode(HTMLNode):
     def __eq__(self, other):
         if not isinstance(other, LeafNode):
             return False
-        return self.tag == other.tag and self.value == other.value and self.props == other.props
+        return self.tag == self.tag and self.value == self.value and self.props == self.props
 
     def to_html(self):
         if self.value is None:
@@ -47,7 +47,7 @@ class ParentNode(HTMLNode):
     def __eq__(self, other):
         if not isinstance(other, ParentNode):
             return False
-        return (self.tag == other.tag and self.children == other.children and self.props == other.props)
+        return (self.tag == self.tag and self.children == self.children and self.props == self.props)
 
     def to_html(self):
         if self.tag is None:

@@ -40,15 +40,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def extract_markdown_images(text):
-    """ return a list of tuples with the image text and url idk why i'm writing comment on useless func tiz omak khara """
-
+    """ return a list of tuples with the image text and url """
     pattern = r"!\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
 
 def extract_markdown_links(text):
-    """ return a list of tuples with the link text and url idk why i'm writing comment on useless func tiz omak khara """
-
+    """ return a list of tuples with the link text and url """
     pattern = r"\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
@@ -177,34 +175,54 @@ def detect_block_type(block):
         return block_type_paragraph
 
 
+def extract_class_props(block):
+    """Extract class properties from a markdown block and return the cleaned block and class props."""
+    class_props = {}
+    class_pattern = r"\{\$class=([^\}]+)\}"
+    cleaned_block = []
+    for line in block:
+        match = re.search(class_pattern, line)
+        if match:
+            class_props["class"] = match.group(1)
+            cleaned_line = re.sub(class_pattern, "", line).strip()
+            cleaned_block.append(cleaned_line)
+        else:
+            cleaned_block.append(line)
+    return cleaned_block, class_props
+
+
 def block_to_html_node(block, block_type):
+    block, class_props = extract_class_props(block)
+
     if block_type == block_type_heading:
         stripped = block[0].lstrip()
         heading_level = len(
             list(next((group for group in itertools.groupby(stripped)), ('#', 0))[1]))
         heading_level = min(heading_level, 6)
         content = stripped.lstrip("#").strip()
-        return ParentNode(f"h{heading_level}", [text_node_to_html_node(node) for node in text_to_textnodes(content)])
+        return ParentNode(f"h{heading_level}", [text_node_to_html_node(node) for node in text_to_textnodes(content)], class_props)
 
     elif block_type == block_type_code:
-
         code_lines = block[1:-1]
-
         code_text = "\n".join(code_lines) + "\n"
+        return ParentNode("pre", [LeafNode("code", code_text)], class_props)
 
-        return ParentNode("pre", [LeafNode("code", code_text)])
     elif block_type == block_type_quote:
         quote_content = " ".join([line.lstrip("> ").strip() for line in block])
-        return ParentNode("blockquote", [text_node_to_html_node(node) for node in text_to_textnodes(quote_content)])
+        return ParentNode("blockquote", [text_node_to_html_node(node) for node in text_to_textnodes(quote_content)], class_props)
+
     elif block_type == block_type_unordered_list:
         list_items = [line.lstrip("* ").strip() for line in block]
-        return ParentNode("ul", [ParentNode("li", [text_node_to_html_node(node) for node in text_to_textnodes(item)]) for item in list_items])
+        return ParentNode("ul", [ParentNode("li", [text_node_to_html_node(node) for node in text_to_textnodes(item)]) for item in list_items], class_props)
+
     elif block_type == block_type_ordered_list:
         list_items = [line.lstrip("0123456789. ").strip() for line in block]
-        return ParentNode("ol", [ParentNode("li", [text_node_to_html_node(node) for node in text_to_textnodes(item)]) for item in list_items])
+        return ParentNode("ol", [ParentNode("li", [text_node_to_html_node(node) for node in text_to_textnodes(item)]) for item in list_items], class_props)
+
     elif block_type == block_type_paragraph:
         paragraph_text = " ".join(block)
-        return ParentNode("p", [text_node_to_html_node(node) for node in text_to_textnodes(paragraph_text)])
+        return ParentNode("p", [text_node_to_html_node(node) for node in text_to_textnodes(paragraph_text)], class_props)
+
     else:
         raise ValueError(f"Invalid block type: {block_type}")
 

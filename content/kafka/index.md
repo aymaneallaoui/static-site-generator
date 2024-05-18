@@ -6,7 +6,7 @@
 
 > "Do you think you know me? Just because you've seen a fragment of my past? That’s the danger of curiosity—it gives you a taste, but never the full picture."
 
-In the vibrant universe of Honkai: Star Rail, few characters captivate the imagination quite like Kafka. Her enigmatic persona and multifaceted nature make her a standout in a game brimming with compelling heroes and villains.
+In the vibrant universe of Honkai: Star Rail, few characters captivate the imagination quite like Kafka. Her enigmatic persona and multifaceted nature make her a standout in a game brimming with compelling heroes and villains {$class=card}
 
 ## The Enigma of Kafka
 

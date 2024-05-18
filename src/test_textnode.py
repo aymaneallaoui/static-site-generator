@@ -311,5 +311,87 @@ class TestMarkdownToHtmlNode(unittest.TestCase):
         self.assertEqual(node, expected_node)
 
 
+class TestMarkdownToHTMLClassNames(unittest.TestCase):
+
+    def test_heading_with_class(self):
+        markdown = "# Heading {$class=card}"
+        html_node = markdown_to_html_node(markdown)
+        self.assertIsInstance(html_node, ParentNode)
+        self.assertEqual(html_node.tag, "div")
+        self.assertEqual(len(html_node.children), 1)
+
+        heading = html_node.children[0]
+        self.assertIsInstance(heading, ParentNode)
+        self.assertEqual(heading.tag, "h1")
+        self.assertEqual(heading.props, {"class": "card"})
+        self.assertEqual(heading.children[0].value, "Heading")
+
+    def test_paragraph_with_class(self):
+        markdown = "This is a paragraph. {$class=card}"
+        html_node = markdown_to_html_node(markdown)
+        self.assertIsInstance(html_node, ParentNode)
+        self.assertEqual(html_node.tag, "div")
+        self.assertEqual(len(html_node.children), 1)
+
+        paragraph = html_node.children[0]
+        self.assertIsInstance(paragraph, ParentNode)
+        self.assertEqual(paragraph.tag, "p")
+        self.assertEqual(paragraph.props, {"class": "card"})
+        self.assertEqual(paragraph.children[0].value, "This is a paragraph.")
+
+    def test_code_block_with_class(self):
+        markdown = "```\nCode block\n``` {$class=code-class}"
+        html_node = markdown_to_html_node(markdown)
+        self.assertIsInstance(html_node, ParentNode)
+        self.assertEqual(html_node.tag, "div")
+        self.assertEqual(len(html_node.children), 1)
+
+        code_block = html_node.children[0]
+        self.assertIsInstance(code_block, ParentNode)
+        self.assertEqual(code_block.tag, "pre")
+        self.assertEqual(code_block.props, {"class": "code-class"})
+
+        code = code_block.children[0]
+        self.assertIsInstance(code, LeafNode)
+        self.assertEqual(code.tag, "code")
+        self.assertEqual(code.value, "Code block\n")
+
+    def test_quote_with_class(self):
+        markdown = "> This is a quote. {$class=quote-class}"
+        html_node = markdown_to_html_node(markdown)
+        self.assertIsInstance(html_node, ParentNode)
+        self.assertEqual(html_node.tag, "div")
+        self.assertEqual(len(html_node.children), 1)
+
+        blockquote = html_node.children[0]
+        self.assertIsInstance(blockquote, ParentNode)
+        self.assertEqual(blockquote.tag, "blockquote")
+        self.assertEqual(blockquote.props, {"class": "quote-class"})
+        self.assertEqual(blockquote.children[0].value, "This is a quote.")
+
+    def test_list_with_class(self):
+        markdown = "* Item 1\n* Item 2 {$class=list-class}"
+        html_node = markdown_to_html_node(markdown)
+        self.assertIsInstance(html_node, ParentNode)
+        self.assertEqual(html_node.tag, "div")
+        self.assertEqual(len(html_node.children), 1)
+
+        ul = html_node.children[0]
+        self.assertIsInstance(ul, ParentNode)
+        self.assertEqual(ul.tag, "ul")
+        self.assertEqual(ul.props, {"class": "list-class"})
+        self.assertEqual(len(ul.children), 2)
+
+        li1 = ul.children[0]
+        self.assertIsInstance(li1, ParentNode)
+        self.assertEqual(li1.tag, "li")
+        self.assertEqual(li1.children[0].value, "Item 1")
+
+        li2 = ul.children[1]
+        self.assertIsInstance(li2, ParentNode)
+        self.assertEqual(li2.tag, "li")
+        self.assertEqual(li2.children[0].value, "Item 2")
+
+
 if __name__ == '__main__':
     unittest.main()
