@@ -6,7 +6,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 def run(
     server_class=HTTPServer,
     handler_class=SimpleHTTPRequestHandler,
-    port=3000,
+    port=8888,
     directory=None,
 ):
     if directory:
